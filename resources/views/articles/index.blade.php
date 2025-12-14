@@ -33,9 +33,19 @@
 <body>
     <h1>Lista de artículos</h1>
 
+    <a href="{{ route('articles.create') }}">➕ Nuevo artículo</a>
+    <br><br>
+
     @if($articles->isEmpty())
         <p>No hay artículos disponibles.</p>
     @else
+
+    @if(session('success'))
+    <p style="color: green;">
+        {{ session('success') }}
+    </p>
+    @endif
+
         <table>
             <thead>
                 <tr>

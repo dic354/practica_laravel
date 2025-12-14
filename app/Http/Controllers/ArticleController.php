@@ -24,4 +24,34 @@ class ArticleController extends Controller
         // Pasarlo a la vista
         return view('articles.show', compact('article'));
     }
+
+    // Mostrar formulario
+    public function create()
+    {
+        return view('articles.create');
+    }
+
+    // Guardar artículo
+    public function store(Request $request)
+    {
+        // Validación
+        $request->validate([
+            'title'   => 'required|min:3',
+            'content' => 'required|min:10',
+            'date'    => 'required|date',
+        ]);
+
+        // Crear artículo
+        $article = new Article();
+        $article->title = $request->title;
+        $article->content = $request->content;
+        $article->created_at = $request->date;
+        $article->user_id = 1; // por ahora fijo
+        $article->save();
+
+        // Redirigir con mensaje
+        return redirect()
+            ->route('articles.index')
+            ->with('success', 'Artículo creado correctamente');
+    }
 }
