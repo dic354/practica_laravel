@@ -31,27 +31,35 @@
     </style>
 </head>
 <body>
+
     <h1>Lista de artículos</h1>
 
     <a href="{{ route('articles.create') }}">➕ Nuevo artículo</a>
     <br><br>
 
+    {{-- Mensajes --}}
+    @if(session('success'))
+        <p style="color: green;">
+            {{ session('success') }}
+        </p>
+    @endif
+
+    @if(session('error'))
+        <p style="color: red;">
+            {{ session('error') }}
+        </p>
+    @endif
+
     @if($articles->isEmpty())
         <p>No hay artículos disponibles.</p>
     @else
-
-    @if(session('success'))
-    <p style="color: green;">
-        {{ session('success') }}
-    </p>
-    @endif
-
         <table>
             <thead>
                 <tr>
                     <th>ID</th>
                     <th>Título</th>
                     <th>Fecha de creación</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -64,10 +72,25 @@
                             </a>
                         </td>
                         <td>{{ $article->created_at->format('d/m/Y') }}</td>
+                        <td>
+                            <form
+                                action="{{ route('articles.destroy', $article->id) }}"
+                                method="POST"
+                                style="display:inline;"
+                                onsubmit="return confirm('¿Seguro que quieres borrar este artículo?');"
+                            >
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" style="color:red;">
+                                    🗑 Eliminar
+                                </button>
+                            </form>
+                        </td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
     @endif
+
 </body>
 </html>

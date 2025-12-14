@@ -55,3 +55,6 @@ Route::post('/articles', [ArticleController::class, 'store'])
 
 Route::get('/articles/{id}', [ArticleController::class, 'show'])
     ->name('articles.show');
+
+Route::delete('/articles/{id}', [ArticleController::class, 'destroy'])
+    ->name('articles.destroy');
