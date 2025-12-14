@@ -4,9 +4,23 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Article;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class ArticleController extends Controller
+class ArticleController extends Controller implements HasMiddleware
 {
+    /**
+     * middlewares para el controlador (Laravel 11+)
+     * Solo usuarios autenticados pueden crear, guardar y eliminar
+     */
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('auth', only: ['create', 'store', 'destroy']),
+        ];
+    }
+
     public function index()
     {
         // Traer todos los artículos
@@ -25,13 +39,13 @@ class ArticleController extends Controller
         return view('articles.show', compact('article'));
     }
 
-    // Mostrar formulario
+    // Mostrar formulario (PROTEGIDO por middleware)
     public function create()
     {
         return view('articles.create');
     }
 
-    // Guardar artículo
+    // Guardar artículo (PROTEGIDO por middleware)
     public function store(Request $request)
     {
         // Validación
@@ -41,12 +55,12 @@ class ArticleController extends Controller
             'date'    => 'required|date',
         ]);
 
-        // Crear artículo
+        // Crear artículo asociado al usuario autenticado
         $article = new Article();
         $article->title = $request->title;
         $article->content = $request->content;
         $article->created_at = $request->date;
-        $article->user_id = 1; // por ahora fijo
+        $article->user_id = Auth::id(); // Usuario autenticado actual
         $article->save();
 
         // Redirigir con mensaje
@@ -55,7 +69,7 @@ class ArticleController extends Controller
             ->with('success', 'Artículo creado correctamente');
     }
 
-    // Eliminar artículo
+    // Eliminar artículo (PROTEGIDO por middleware)
     public function destroy($id)
     {
          try {

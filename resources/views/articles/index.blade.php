@@ -28,14 +28,44 @@
         tr:nth-child(even) {
             background-color: #fafafa;
         }
+        .user-info {
+            float: right;
+            background-color: #e8f4f8;
+            padding: 10px;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
 
+    {{-- Bloque para usuarios autenticados: mostrar nombre y logout --}}
+    @auth
+        <div class="user-info">
+            👤 Hola, <strong>{{ Auth::user()->name }}</strong> |
+            <form action="{{ route('logout') }}" method="POST" style="display:inline;">
+                @csrf
+                <button type="submit" style="background:none;border:none;color:blue;text-decoration:underline;cursor:pointer;">
+                    Cerrar sesión
+                </button>
+            </form>
+        </div>
+    @endauth
+
+    {{-- Bloque para usuarios NO autenticados: mostrar enlaces de login/register --}}
+    @guest
+        <div class="user-info">
+            <a href="{{ route('login') }}">🔐 Iniciar sesión</a> |
+            <a href="{{ route('register') }}">📝 Registrarse</a>
+        </div>
+    @endguest
+
     <h1>Lista de artículos</h1>
 
-    <a href="{{ route('articles.create') }}">➕ Nuevo artículo</a>
-    <br><br>
+    {{-- Solo usuarios autenticados pueden ver el botón de crear artículo --}}
+    @auth
+        <a href="{{ route('articles.create') }}">➕ Nuevo artículo</a>
+        <br><br>
+    @endauth
 
     {{-- Mensajes --}}
     @if(session('success'))
@@ -59,7 +89,10 @@
                     <th>ID</th>
                     <th>Título</th>
                     <th>Fecha de creación</th>
-                    <th>Acciones</th>
+                    {{-- Solo mostrar columna "Acciones" si está autenticado --}}
+                    @auth
+                        <th>Acciones</th>
+                    @endauth
                 </tr>
             </thead>
             <tbody>
@@ -72,20 +105,24 @@
                             </a>
                         </td>
                         <td>{{ $article->created_at->format('d/m/Y') }}</td>
-                        <td>
-                            <form
-                                action="{{ route('articles.destroy', $article->id) }}"
-                                method="POST"
-                                style="display:inline;"
-                                onsubmit="return confirm('¿Seguro que quieres borrar este artículo?');"
-                            >
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" style="color:red;">
-                                    🗑 Eliminar
-                                </button>
-                            </form>
-                        </td>
+                        
+                        {{-- Solo usuarios autenticados ven el botón de eliminar --}}
+                        @auth
+                            <td>
+                                <form
+                                    action="{{ route('articles.destroy', $article->id) }}"
+                                    method="POST"
+                                    style="display:inline;"
+                                    onsubmit="return confirm('¿Seguro que quieres borrar este artículo?');"
+                                >
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" style="color:red;">
+                                        🗑 Eliminar
+                                    </button>
+                                </form>
+                            </td>
+                        @endauth
                     </tr>
                 @endforeach
             </tbody>
