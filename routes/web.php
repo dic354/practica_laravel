@@ -53,19 +53,6 @@ Route::get('/test', function () {
 
 /*
 |--------------------------------------------------------------------------
-| Rutas de artículos
-|--------------------------------------------------------------------------
-*/
-
-// Listado y vista de artículos (público)
-Route::get('/articles', [ArticleController::class, 'index'])
-    ->name('articles.index');
-
-Route::get('/articles/{id}', [ArticleController::class, 'show'])
-    ->name('articles.show');
-
-/*
-|--------------------------------------------------------------------------
 | Rutas de autenticación (Guest - no autenticados)
 |--------------------------------------------------------------------------
 */
@@ -95,22 +82,34 @@ Route::middleware('guest')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Rutas protegidas (requieren autenticación)
+| Rutas de artículos
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth')->group(function () {
-    // Dashboard (opcional, puedes eliminarla si no la usas)
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
 
-    // Rutas de artículos protegidas
+// Rutas protegidas de artículos (requieren autenticación)
+Route::middleware('auth')->group(function () {
+    // Crear artículo (debe ir ANTES de /articles/{id})
     Route::get('/articles/create', [ArticleController::class, 'create'])
         ->name('articles.create');
     Route::post('/articles', [ArticleController::class, 'store'])
         ->name('articles.store');
     Route::delete('/articles/{id}', [ArticleController::class, 'destroy'])
         ->name('articles.destroy');
+});
+
+// Rutas públicas de artículos (cualquiera puede ver)
+Route::get('/articles', [ArticleController::class, 'index'])
+    ->name('articles.index');
+
+Route::get('/articles/{id}', [ArticleController::class, 'show'])
+    ->name('articles.show');
+
+/*
+|--------------------------------------------------------------------------
+| Rutas protegidas (requieren autenticación)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
 
     // Rutas de perfil (Breeze)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
