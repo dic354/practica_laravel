@@ -48,7 +48,11 @@
                 @foreach ($articles as $article)
                     <tr>
                         <td>{{ $article->id }}</td>
-                        <td>{{ $article->title }}</td>
+                        <td>
+                            <a href="{{ route('articles.show', $article->id) }}">
+                                {{ $article->title }}
+                            </a>
+                        </td>
                         <td>{{ $article->created_at->format('d/m/Y') }}</td>
                     </tr>
                 @endforeach

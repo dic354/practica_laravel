@@ -15,4 +15,13 @@ class ArticleController extends Controller
         // Pasarlos a la vista
         return view('articles.index', compact('articles'));
     }
+
+    public function show($id)
+    {
+        // Buscar el artículo por ID
+        $article = Article::findOrFail($id);
+
+        // Pasarlo a la vista
+        return view('articles.show', compact('article'));
+    }
 }
